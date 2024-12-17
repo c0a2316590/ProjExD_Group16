@@ -27,9 +27,10 @@ font = pygame.font.Font(None, 36)
 
 # ゾンビクラスの定義
 class Zombie:
-    def __init__(self, x, y, speed):
+    def __init__(self, x, y, speed, hp):
         self.rect = pygame.Rect(x, y, GRID_SIZE, GRID_SIZE)  # ゾンビを長方形で表す
         self.speed = speed
+        self.hp = hp  # ゾンビのHP
         self.alive = True  # 障害物に到達すると停止
 
     def move(self, obstacles):
@@ -58,9 +59,9 @@ def draw_grid(surface, width, height, grid_size, offset_y):
         pygame.draw.line(surface, WHITE, (0, y), (width, y))
 
 # 情報エリアを描画する関数
-def draw_info_area(surface, width, height):
+def draw_info_area(surface, width, height, score):
     pygame.draw.rect(surface, GRAY, (0, 0, width, height))
-    draw_text(surface, "score: 0", 20, 20, BLACK)
+    draw_text(surface, f"score: {score}", 20, 50, BLACK)  # スコア表示
     draw_text(surface, "set", 200, 20, BLACK)
 
 # メインのゲームループ
@@ -68,10 +69,18 @@ def main():
     clock = pygame.time.Clock()
 
     # ゾンビを1体生成
-    zombie = Zombie(SCREEN_WIDTH, INFO_AREA_HEIGHT + GRID_SIZE * 2, 2)
+    zombie = Zombie(SCREEN_WIDTH, INFO_AREA_HEIGHT + GRID_SIZE * 2, 2, 10)
 
     # 障害物（植物）を格納するリスト
     plants = []
+
+    # スコア
+    score = 0
+
+    # 仮zombie
+    zombies = []
+    # 仮beam
+    beams = []
 
     # ゲームループ
     while True:
@@ -92,7 +101,7 @@ def main():
         screen.fill(GREEN)
 
         # 情報エリアの描画
-        draw_info_area(screen, SCREEN_WIDTH, INFO_AREA_HEIGHT)
+        draw_info_area(screen, SCREEN_WIDTH, INFO_AREA_HEIGHT, score)
 
         # マス目の描画
         draw_grid(screen, SCREEN_WIDTH, SCREEN_HEIGHT, GRID_SIZE, INFO_AREA_HEIGHT)
@@ -105,7 +114,17 @@ def main():
         zombie.move(plants)
         zombie.draw(screen)
 
-        # 画面の更新
+        for i, beam in enumerate(beams):  
+            for j, zom in enumerate(zombies):
+                if beam is not None and zom is not None:  # beamとzombieが画面上にあるならば
+                    if beam.rct.colliderect(zom.rct):  # beamとzombieが衝突したら
+                        beams[i] = None
+                        zom.hp -= 1  # ゾンビのHPを１減らす
+                        if zom.hp <= 0:  # ゾンビのHPが0以下ならば
+                            zombie[j] = None
+                            score += 1
+                        pygame.display.update()
+
         pygame.display.update()
         clock.tick(60)
 
