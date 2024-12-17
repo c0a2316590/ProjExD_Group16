@@ -117,7 +117,7 @@ def main():
         for i, beam in enumerate(beams):  
             for j, zom in enumerate(zombies):
                 if beam is not None and zom is not None:  # beamとzombieが画面上にあるならば
-                    if beam.rct.colliderect(zom.rct):  # beamとzombieが衝突したら
+                    if beam.rect.colliderect(zom.rect):  # beamとzombieが衝突したら
                         beams[i] = None
                         zom.hp -= 1  # ゾンビのHPを１減らす
                         if zom.hp <= 0:  # ゾンビのHPが0以下ならば
