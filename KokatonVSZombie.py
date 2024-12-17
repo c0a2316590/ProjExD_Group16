@@ -122,7 +122,7 @@ def main():
                         zom.hp -= 1  # ゾンビのHPを１減らす
                         if zom.hp <= 0:  # ゾンビのHPが0以下ならば
                             zombie[j] = None
-                            score += 1
+                            score += 1  # スコアを増やす
                         pygame.display.update()
 
         pygame.display.update()
